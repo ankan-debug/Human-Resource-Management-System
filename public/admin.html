@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="night">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OOD HRMS — HR Admin Console</title>
+  <meta name="description" content="HR Admin dashboard – analytics, employee directory, leave approvals">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4/dist/full.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="gradient-bg min-h-screen" x-data="adminApp()" x-init="init()">
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="flex min-h-screen">
+
+    <!-- ═══ Sidebar ═══ -->
+    <aside class="sidebar w-64 fixed top-0 left-0 bottom-0 flex flex-col z-30">
+      <div class="p-5 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center shadow-lg">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="font-bold text-white text-sm">OOD HRMS</h2>
+          <p class="text-xs text-slate-500">Admin Console</p>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-3 py-4 space-y-1">
+        <button @click="tab='dashboard'" :class="tab==='dashboard' && 'active'" class="sidebar-link w-full text-left">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+          Dashboard
+        </button>
+        <button @click="tab='employees'" :class="tab==='employees' && 'active'" class="sidebar-link w-full text-left">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+          Employees
+        </button>
+        <button @click="tab='leaves'" :class="tab==='leaves' && 'active'" class="sidebar-link w-full text-left">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Leave Approvals
+          <template x-if="pendingLeaves.length > 0">
+            <span class="ml-auto badge badge-sm badge-warning" x-text="pendingLeaves.length"></span>
+          </template>
+        </button>
+        <button @click="tab='analytics'" :class="tab==='analytics' && 'active'" class="sidebar-link w-full text-left">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"/><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"/></svg>
+          Analytics
+        </button>
+      </nav>
+
+      <!-- User Card -->
+      <div class="p-4 border-t border-white/5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-sm font-bold text-white"
+               x-text="user ? fmt.initials(user.firstName, user.lastName) : ''"></div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-white truncate" x-text="user ? user.firstName + ' ' + user.lastName : ''"></p>
+            <p class="text-xs text-amber-400/70">HR Manager</p>
+          </div>
+          <button @click="logout()" class="btn btn-ghost btn-xs text-slate-400 hover:text-red-400" title="Logout">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═══ Main Content ═══ -->
+    <main class="flex-1 ml-64 main-shift relative z-10">
+      <header class="sticky top-0 z-20 glass border-b border-white/5 px-8 py-4 flex items-center justify-between">
+        <div>
+          <h1 class="text-lg font-bold text-white capitalize" x-text="tab === 'leaves' ? 'Leave Approvals' : tab"></h1>
+          <p class="text-xs text-slate-500" x-text="new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})"></p>
+        </div>
+      </header>
+
+      <div class="p-8">
+
+        <!-- ══ Dashboard ══ -->
+        <div x-show="tab==='dashboard'" x-transition class="space-y-6">
+          <!-- Stat Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="glass-card stat-card p-5 fade-in">
+              <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Total Employees</p>
+              <p class="text-3xl font-extrabold text-white mt-2" x-text="stats.totalEmployees"></p>
+              <p class="text-xs text-violet-400 mt-1">Active workforce</p>
+            </div>
+            <div class="glass-card stat-card p-5 fade-in fade-d1">
+              <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Present Today</p>
+              <p class="text-3xl font-extrabold text-emerald-400 mt-2" x-text="stats.presentToday"></p>
+              <p class="text-xs text-slate-500 mt-1" x-text="stats.totalEmployees ? Math.round(stats.presentToday/stats.totalEmployees*100) + '% attendance' : ''"></p>
+            </div>
+            <div class="glass-card stat-card p-5 fade-in fade-d2">
+              <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Absent Today</p>
+              <p class="text-3xl font-extrabold text-red-400 mt-2" x-text="stats.absentToday"></p>
+              <p class="text-xs text-slate-500 mt-1">Not checked in</p>
+            </div>
+            <div class="glass-card stat-card p-5 fade-in fade-d3">
+              <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">On Leave</p>
+              <p class="text-3xl font-extrabold text-amber-400 mt-2" x-text="stats.onLeaveToday"></p>
+              <p class="text-xs text-slate-500 mt-1">Approved time-off</p>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="glass-card p-6 fade-in fade-d4">
+              <h3 class="text-sm font-semibold text-slate-300 mb-4">Today's Attendance</h3>
+              <div class="flex justify-center" style="max-height:280px">
+                <canvas id="attendanceChart"></canvas>
+              </div>
+            </div>
+            <div class="glass-card p-6 fade-in fade-d5">
+              <h3 class="text-sm font-semibold text-slate-300 mb-4">Salary Distribution</h3>
+              <div style="max-height:280px">
+                <canvas id="salaryChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending Leaves Quick View -->
+          <template x-if="pendingLeaves.length > 0">
+            <div class="glass-card p-6 fade-in">
+              <h3 class="text-sm font-semibold text-amber-400 mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                Pending Leave Requests (<span x-text="pendingLeaves.length"></span>)
+              </h3>
+              <div class="space-y-3">
+                <template x-for="lr in pendingLeaves.slice(0,3)" :key="lr.id">
+                  <div class="flex items-center justify-between p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-xs font-bold text-white"
+                           x-text="fmt.initials(lr.first_name, lr.last_name)"></div>
+                      <div>
+                        <p class="text-sm font-medium text-white" x-text="lr.first_name + ' ' + lr.last_name"></p>
+                        <p class="text-xs text-slate-500" x-text="fmt.date(lr.start_date) + ' → ' + fmt.date(lr.end_date)"></p>
+                      </div>
+                    </div>
+                    <div class="flex gap-2">
+                      <button @click="approveLeave(lr.id)" class="btn btn-xs btn-success border-0 bg-emerald-600 hover:bg-emerald-500 text-white">Approve</button>
+                      <button @click="rejectLeave(lr.id)" class="btn btn-xs btn-error border-0 bg-red-600 hover:bg-red-500 text-white">Reject</button>
+                    </div>
+                  </div>
+                </template>
+              </div>
+              <button x-show="pendingLeaves.length > 3" @click="tab='leaves'" class="btn btn-ghost btn-sm text-violet-400 mt-3">View all →</button>
+            </div>
+          </template>
+        </div>
+
+        <!-- ══ Employees ══ -->
+        <div x-show="tab==='employees'" x-transition class="space-y-6">
+          <div class="glass-card p-6 fade-in">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-semibold text-slate-300">Employee Directory</h3>
+              <div class="flex items-center gap-2 text-xs text-slate-500">
+                <span class="status-dot green" style="width:8px;height:8px"></span> Present
+                <span class="status-dot red ml-2" style="width:8px;height:8px"></span> Absent
+                <span class="status-dot yellow ml-2" style="width:8px;height:8px"></span> Leave
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="table table-sm">
+                <thead>
+                  <tr class="border-white/5 text-slate-500 text-xs uppercase">
+                    <th>Status</th><th>Employee</th><th>ID</th><th>Department</th><th>Designation</th><th>Wage</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="emp in employees" :key="emp.id">
+                    <tr class="border-white/5 hover:bg-white/[0.02] transition-colors">
+                      <td><span class="status-dot" :class="emp.statusDot"></span></td>
+                      <td>
+                        <div class="flex items-center gap-3">
+                          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/60 to-cyan-500/60 flex items-center justify-center text-xs font-bold text-white"
+                               x-text="fmt.initials(emp.first_name, emp.last_name)"></div>
+                          <div>
+                            <p class="text-sm font-medium text-white" x-text="emp.first_name + ' ' + emp.last_name"></p>
+                            <p class="text-xs text-slate-500" x-text="emp.email"></p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="font-mono text-xs text-violet-400" x-text="emp.employee_id"></td>
+                      <td class="text-xs text-slate-400" x-text="emp.department"></td>
+                      <td class="text-xs text-slate-400" x-text="emp.designation"></td>
+                      <td class="text-xs text-slate-300 font-medium" x-text="fmt.currency(emp.total_wage)"></td>
+                      <td>
+                        <button @click="openEditModal(emp)" class="btn btn-ghost btn-xs text-violet-400 hover:text-violet-300">
+                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                          Edit
+                        </button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Leave Approvals ══ -->
+        <div x-show="tab==='leaves'" x-transition class="space-y-6">
+          <!-- Pending -->
+          <div class="glass-card p-6 fade-in">
+            <h3 class="text-sm font-semibold text-amber-400 mb-4">Pending Requests</h3>
+            <template x-if="pendingLeaves.length === 0">
+              <div class="text-center py-10">
+                <svg class="w-12 h-12 mx-auto text-slate-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p class="text-slate-500 text-sm">All caught up! No pending requests.</p>
+              </div>
+            </template>
+            <div class="space-y-3">
+              <template x-for="lr in pendingLeaves" :key="lr.id">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5 gap-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-sm font-bold text-white"
+                         x-text="fmt.initials(lr.first_name, lr.last_name)"></div>
+                    <div>
+                      <p class="text-sm font-semibold text-white" x-text="lr.first_name + ' ' + lr.last_name"></p>
+                      <p class="text-xs text-slate-500" x-text="lr.employee_id + ' · ' + lr.department"></p>
+                    </div>
+                  </div>
+                  <div class="flex-1 sm:text-center">
+                    <p class="text-xs text-slate-400" x-text="fmt.date(lr.start_date) + ' → ' + fmt.date(lr.end_date)"></p>
+                    <p class="text-xs text-slate-500 mt-0.5"><span class="badge badge-xs badge-outline" x-text="lr.leave_type"></span> · <span x-text="lr.reason"></span></p>
+                  </div>
+                  <div class="flex gap-2">
+                    <button @click="approveLeave(lr.id)"
+                            class="btn btn-sm border-0 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold gap-1">
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                      Approve
+                    </button>
+                    <button @click="rejectLeave(lr.id)"
+                            class="btn btn-sm border-0 bg-red-600/80 hover:bg-red-500 text-white font-semibold gap-1">
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- All Leaves History -->
+          <div class="glass-card p-6 fade-in fade-d1">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">All Leave History</h3>
+            <div class="overflow-x-auto">
+              <table class="table table-sm">
+                <thead>
+                  <tr class="border-white/5 text-slate-500 text-xs uppercase">
+                    <th>Employee</th><th>Period</th><th>Type</th><th>Reason</th><th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="lr in allLeaves" :key="lr.id">
+                    <tr class="border-white/5 hover:bg-white/[0.02]">
+                      <td class="text-sm text-white" x-text="lr.first_name + ' ' + lr.last_name"></td>
+                      <td class="text-xs text-slate-400" x-text="fmt.date(lr.start_date) + ' → ' + fmt.date(lr.end_date)"></td>
+                      <td><span class="badge badge-sm badge-outline" x-text="lr.leave_type"></span></td>
+                      <td class="text-xs text-slate-400 max-w-[200px] truncate" x-text="lr.reason"></td>
+                      <td>
+                        <span class="badge badge-sm"
+                              :class="lr.status==='Approved'?'badge-success':lr.status==='Rejected'?'badge-error':'badge-warning'"
+                              x-text="lr.status"></span>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Analytics ══ -->
+        <div x-show="tab==='analytics'" x-transition class="space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="glass-card p-6 fade-in">
+              <h3 class="text-sm font-semibold text-slate-300 mb-4">Department Head-Count</h3>
+              <div style="max-height:320px"><canvas id="deptChart"></canvas></div>
+            </div>
+            <div class="glass-card p-6 fade-in fade-d1">
+              <h3 class="text-sm font-semibold text-slate-300 mb-4">Salary Breakdown</h3>
+              <div style="max-height:320px"><canvas id="salaryChart2"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ═══ Edit Employee Modal ═══ -->
+  <dialog id="editModal" class="modal">
+    <div class="modal-box bg-slate-900 border border-white/10 max-w-md">
+      <h3 class="text-lg font-bold text-white mb-4">Edit Employee</h3>
+      <template x-if="editingEmployee">
+        <form @submit.prevent="saveEmployee()" class="space-y-4">
+          <p class="text-sm text-slate-400" x-text="editingEmployee.first_name + ' ' + editingEmployee.last_name + ' (' + editingEmployee.employee_id + ')'"></p>
+
+          <label class="form-control">
+            <span class="label"><span class="label-text text-slate-400 text-xs">Total Wage (₹)</span></span>
+            <input type="number" x-model.number="editForm.total_wage" min="0" step="1000"
+                   class="input input-bordered bg-white/5 border-white/10 text-white focus:border-violet-500">
+          </label>
+          <label class="form-control">
+            <span class="label"><span class="label-text text-slate-400 text-xs">Department</span></span>
+            <input type="text" x-model="editForm.department"
+                   class="input input-bordered bg-white/5 border-white/10 text-white focus:border-violet-500">
+          </label>
+          <label class="form-control">
+            <span class="label"><span class="label-text text-slate-400 text-xs">Designation</span></span>
+            <input type="text" x-model="editForm.designation"
+                   class="input input-bordered bg-white/5 border-white/10 text-white focus:border-violet-500">
+          </label>
+
+          <div class="modal-action">
+            <button type="button" @click="document.getElementById('editModal').close()" class="btn btn-ghost text-slate-400">Cancel</button>
+            <button type="submit" class="btn border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-semibold">Save Changes</button>
+          </div>
+        </form>
+      </template>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+  </dialog>
+
+  <script src="/js/app.js"></script>
+  <script>
+    function adminApp() {
+      return {
+        tab: 'dashboard',
+        user: null,
+        stats: { totalEmployees: 0, presentToday: 0, absentToday: 0, onLeaveToday: 0, salaryRanges: {}, departments: {} },
+        employees: [],
+        pendingLeaves: [],
+        allLeaves: [],
+        editingEmployee: null,
+        editForm: { total_wage: 0, department: '', designation: '' },
+        chartsRendered: false,
+        analyticsRendered: false,
+
+        async init() {
+          if (!requireAuth('HR')) return;
+          this.user = getUser();
+          await Promise.all([this.loadStats(), this.loadEmployees(), this.loadPendingLeaves(), this.loadAllLeaves()]);
+
+          this.$nextTick(() => this.renderDashboardCharts());
+
+          this.$watch('tab', (val) => {
+            if (val === 'analytics') this.$nextTick(() => this.renderAnalyticsCharts());
+          });
+        },
+
+        async loadStats() {
+          try { this.stats = await api('/admin/stats'); } catch {}
+        },
+
+        async loadEmployees() {
+          try { this.employees = await api('/admin/employees'); } catch {}
+        },
+
+        async loadPendingLeaves() {
+          try { this.pendingLeaves = await api('/leave/pending'); } catch {}
+        },
+
+        async loadAllLeaves() {
+          try { this.allLeaves = await api('/leave/all'); } catch {}
+        },
+
+        async approveLeave(id) {
+          try {
+            await api(`/leave/approve/${id}`, { method: 'PUT' });
+            showToast('Leave approved ✓', 'success');
+            await Promise.all([this.loadPendingLeaves(), this.loadAllLeaves(), this.loadStats(), this.loadEmployees()]);
+          } catch (e) { showToast(e.message, 'error'); }
+        },
+
+        async rejectLeave(id) {
+          try {
+            await api(`/leave/reject/${id}`, { method: 'PUT' });
+            showToast('Leave rejected', 'warning');
+            await Promise.all([this.loadPendingLeaves(), this.loadAllLeaves()]);
+          } catch (e) { showToast(e.message, 'error'); }
+        },
+
+        openEditModal(emp) {
+          this.editingEmployee = emp;
+          this.editForm = { total_wage: emp.total_wage || 0, department: emp.department || '', designation: emp.designation || '' };
+          document.getElementById('editModal').showModal();
+        },
+
+        async saveEmployee() {
+          try {
+            await api(`/admin/employee/${this.editingEmployee.id}`, { method: 'PUT', body: this.editForm });
+            showToast('Employee updated', 'success');
+            document.getElementById('editModal').close();
+            await Promise.all([this.loadEmployees(), this.loadStats()]);
+          } catch (e) { showToast(e.message, 'error'); }
+        },
+
+        renderDashboardCharts() {
+          if (this.chartsRendered) return;
+          this.chartsRendered = true;
+
+          // Attendance Doughnut
+          const attCtx = document.getElementById('attendanceChart');
+          if (attCtx) {
+            new Chart(attCtx, {
+              type: 'doughnut',
+              data: {
+                labels: ['Present', 'Absent', 'On Leave'],
+                datasets: [{
+                  data: [this.stats.presentToday, this.stats.absentToday, this.stats.onLeaveToday],
+                  backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
+                  borderColor: 'transparent',
+                  borderWidth: 0,
+                  hoverOffset: 6,
+                }],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: '65%',
+                plugins: {
+                  legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 16, font: { size: 12, family: 'Inter' } } },
+                },
+              },
+            });
+          }
+
+          // Salary Bar
+          const salCtx = document.getElementById('salaryChart');
+          if (salCtx) {
+            const ranges = this.stats.salaryRanges || {};
+            new Chart(salCtx, {
+              type: 'bar',
+              data: {
+                labels: Object.keys(ranges),
+                datasets: [{
+                  label: 'Employees',
+                  data: Object.values(ranges),
+                  backgroundColor: ['#8b5cf6', '#7c3aed', '#6d28d9', '#5b21b6', '#4c1d95'],
+                  borderRadius: 8,
+                  borderSkipped: false,
+                }],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                  x: { ticks: { color: '#94a3b8', font: { size: 11, family: 'Inter' } }, grid: { display: false } },
+                  y: { ticks: { color: '#94a3b8', stepSize: 1, font: { family: 'Inter' } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+                },
+              },
+            });
+          }
+        },
+
+        renderAnalyticsCharts() {
+          if (this.analyticsRendered) return;
+          this.analyticsRendered = true;
+
+          // Department chart
+          const deptCtx = document.getElementById('deptChart');
+          if (deptCtx) {
+            const depts = this.stats.departments || {};
+            new Chart(deptCtx, {
+              type: 'polarArea',
+              data: {
+                labels: Object.keys(depts),
+                datasets: [{
+                  data: Object.values(depts),
+                  backgroundColor: ['rgba(139,92,246,0.6)', 'rgba(6,182,212,0.6)', 'rgba(16,185,129,0.6)', 'rgba(245,158,11,0.6)', 'rgba(236,72,153,0.6)', 'rgba(99,102,241,0.6)'],
+                  borderColor: 'transparent',
+                }],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: true,
+                plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11, family: 'Inter' } } } },
+                scales: { r: { ticks: { color: '#64748b', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } } },
+              },
+            });
+          }
+
+          // Salary distribution (pie variant)
+          const sal2Ctx = document.getElementById('salaryChart2');
+          if (sal2Ctx) {
+            const ranges = this.stats.salaryRanges || {};
+            new Chart(sal2Ctx, {
+              type: 'pie',
+              data: {
+                labels: Object.keys(ranges),
+                datasets: [{
+                  data: Object.values(ranges),
+                  backgroundColor: ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'],
+                  borderColor: 'rgba(0,0,0,0.3)',
+                  borderWidth: 2,
+                }],
+              },
+              options: {
+                responsive: true, maintainAspectRatio: true,
+                plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 14, font: { size: 11, family: 'Inter' } } } },
+              },
+            });
+          }
+        },
+      };
+    }
+  </script>
+</body>
+</html>

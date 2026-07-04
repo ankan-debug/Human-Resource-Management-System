@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="night">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OOD HRMS — Employee Portal</title>
+  <meta name="description" content="Employee self-service portal – attendance, leave, payroll">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4/dist/full.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="gradient-bg min-h-screen" x-data="employeeApp()" x-init="init()">
+
+  <!-- Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="flex min-h-screen">
+
+    <!-- ═══ Sidebar ═══ -->
+    <aside class="sidebar w-64 fixed top-0 left-0 bottom-0 flex flex-col z-30">
+      <!-- Brand -->
+      <div class="p-5 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center shadow-lg">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="font-bold text-white text-sm">OOD HRMS</h2>
+          <p class="text-xs text-slate-500">Employee Portal</p>
+        </div>
+      </div>
+
+      <!-- Nav Links -->
+      <nav class="flex-1 px-3 py-4 space-y-1">
+        <button @click="tab='dashboard'" :class="tab==='dashboard' && 'active'" class="sidebar-link w-full text-left">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+          Dashboard
+        </button>
+        <button @click="tab='attendance'" :class="tab==='attendance' && 'active'" class="sidebar-link w-full text-left">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Attendance
+        </button>
+        <button @click="tab='leave'" :class="tab==='leave' && 'active'" class="sidebar-link w-full text-left">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+          Leave Management
+        </button>
+        <button @click="tab='payroll'" :class="tab==='payroll' && 'active'" class="sidebar-link w-full text-left">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+          Payroll
+        </button>
+      </nav>
+
+      <!-- User Card -->
+      <div class="p-4 border-t border-white/5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-sm font-bold text-white"
+               x-text="user ? fmt.initials(user.firstName, user.lastName) : ''"></div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-white truncate" x-text="user ? user.firstName + ' ' + user.lastName : ''"></p>
+            <p class="text-xs text-slate-500 truncate" x-text="user?.employeeId"></p>
+          </div>
+          <button @click="logout()" class="btn btn-ghost btn-xs text-slate-400 hover:text-red-400" title="Logout">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═══ Main Content ═══ -->
+    <main class="flex-1 ml-64 main-shift relative z-10">
+      <!-- Top Bar -->
+      <header class="sticky top-0 z-20 glass border-b border-white/5 px-8 py-4 flex items-center justify-between">
+        <div>
+          <h1 class="text-lg font-bold text-white capitalize" x-text="tab"></h1>
+          <p class="text-xs text-slate-500" x-text="new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})"></p>
+        </div>
+        <div class="flex items-center gap-3">
+          <template x-if="todayStatus">
+            <div class="flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg"
+                 :class="todayStatus.check_in && !todayStatus.check_out ? 'bg-emerald-500/15 text-emerald-300' :
+                          todayStatus.check_out ? 'bg-slate-500/15 text-slate-300' : 'bg-amber-500/15 text-amber-300'">
+              <span class="status-dot" :class="todayStatus.check_in && !todayStatus.check_out ? 'green' :
+                                                todayStatus.check_out ? '' : 'yellow'"
+                    style="width:8px;height:8px"></span>
+              <span x-text="todayStatus.check_in && !todayStatus.check_out ? 'Clocked In' :
+                            todayStatus.check_out ? 'Day Complete' : 'Not Clocked In'"></span>
+            </div>
+          </template>
+        </div>
+      </header>
+
+      <div class="p-8">
+
+        <!-- ══ Dashboard ══ -->
+        <div x-show="tab==='dashboard'" x-transition class="space-y-6">
+          <!-- Welcome -->
+          <div class="glass-card p-6 fade-in">
+            <h2 class="text-xl font-bold text-white">Welcome back, <span class="gradient-text" x-text="user?.firstName"></span> 👋</h2>
+            <p class="text-sm text-slate-400 mt-1">Here's your day at a glance.</p>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="glass-card stat-card p-5 fade-in fade-d1">
+              <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Today's Status</p>
+              <p class="text-2xl font-bold mt-2"
+                 :class="todayStatus?.check_in ? 'text-emerald-400' : 'text-amber-400'"
+                 x-text="todayStatus?.check_in ? (todayStatus?.check_out ? 'Complete' : 'Clocked In') : 'Not In'"></p>
+              <p class="text-xs text-slate-500 mt-1" x-show="todayStatus?.check_in"
+                 x-text="'Since ' + (todayStatus?.check_in ? fmt.time(todayStatus.check_in) : '')"></p>
+            </div>
+            <div class="glass-card stat-card p-5 fade-in fade-d2">
+              <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Employee ID</p>
+              <p class="text-lg font-bold text-violet-400 mt-2 font-mono" x-text="user?.employeeId"></p>
+              <p class="text-xs text-slate-500 mt-1" x-text="user?.department"></p>
+            </div>
+            <div class="glass-card stat-card p-5 fade-in fade-d3">
+              <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Designation</p>
+              <p class="text-lg font-bold text-cyan-400 mt-2" x-text="user?.designation"></p>
+              <p class="text-xs text-slate-500 mt-1" x-text="user?.email"></p>
+            </div>
+          </div>
+
+          <!-- Check-In/Out Widget -->
+          <div class="glass-card p-6 fade-in fade-d4">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">Attendance</h3>
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+              <template x-if="!todayStatus || !todayStatus.check_in">
+                <button @click="checkIn()" :disabled="clockLoading"
+                        class="checkin-btn btn btn-lg border-0 text-white font-bold px-10 rounded-2xl shadow-lg">
+                  <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/></svg>
+                  Check In
+                </button>
+              </template>
+              <template x-if="todayStatus && todayStatus.check_in && !todayStatus.check_out">
+                <button @click="checkOut()" :disabled="clockLoading"
+                        class="checkin-btn checkout-btn btn btn-lg border-0 text-white font-bold px-10 rounded-2xl shadow-lg">
+                  <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+                  Check Out
+                </button>
+              </template>
+              <template x-if="todayStatus && todayStatus.check_out">
+                <div class="flex items-center gap-3 text-slate-400">
+                  <svg class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <div>
+                    <p class="text-sm font-medium text-emerald-400">Day complete</p>
+                    <p class="text-xs" x-text="'In: ' + fmt.time(todayStatus.check_in) + '  •  Out: ' + fmt.time(todayStatus.check_out)"></p>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Attendance Tab ══ -->
+        <div x-show="tab==='attendance'" x-transition class="space-y-6">
+          <!-- Calendar -->
+          <div class="glass-card p-6 fade-in">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">Attendance Calendar</h3>
+            <div id="attendance-calendar"></div>
+          </div>
+        </div>
+
+        <!-- ══ Leave Tab ══ -->
+        <div x-show="tab==='leave'" x-transition class="space-y-6">
+          <!-- Request Form -->
+          <div class="glass-card p-6 fade-in">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">Request Time Off</h3>
+            <form @submit.prevent="submitLeave()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label class="form-control">
+                <span class="label"><span class="label-text text-slate-400 text-xs">Start Date</span></span>
+                <input type="date" x-model="leaveForm.startDate" required
+                       class="input input-bordered bg-white/5 border-white/10 text-white focus:border-violet-500">
+              </label>
+              <label class="form-control">
+                <span class="label"><span class="label-text text-slate-400 text-xs">End Date</span></span>
+                <input type="date" x-model="leaveForm.endDate" required
+                       class="input input-bordered bg-white/5 border-white/10 text-white focus:border-violet-500">
+              </label>
+              <label class="form-control">
+                <span class="label"><span class="label-text text-slate-400 text-xs">Leave Type</span></span>
+                <select x-model="leaveForm.leaveType"
+                        class="select select-bordered bg-white/5 border-white/10 text-white focus:border-violet-500">
+                  <option value="Casual">Casual Leave</option>
+                  <option value="Sick">Sick Leave</option>
+                  <option value="Earned">Earned Leave</option>
+                  <option value="Unpaid">Unpaid Leave</option>
+                </select>
+              </label>
+              <label class="form-control">
+                <span class="label"><span class="label-text text-slate-400 text-xs">Reason</span></span>
+                <input type="text" x-model="leaveForm.reason" required placeholder="Brief reason…"
+                       class="input input-bordered bg-white/5 border-white/10 text-white placeholder-slate-500 focus:border-violet-500">
+              </label>
+              <div class="md:col-span-2">
+                <button type="submit" :disabled="leaveLoading"
+                        class="btn border-0 bg-gradient-to-r from-violet-600 to-cyan-600 text-white font-semibold shadow-lg shadow-violet-500/20">
+                  Submit Request
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- My Requests -->
+          <div class="glass-card p-6 fade-in fade-d1">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">My Leave Requests</h3>
+            <div class="overflow-x-auto">
+              <table class="table table-sm">
+                <thead>
+                  <tr class="border-white/5 text-slate-500 text-xs uppercase">
+                    <th>Period</th><th>Type</th><th>Reason</th><th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="lr in leaveRequests" :key="lr.id">
+                    <tr class="border-white/5 hover:bg-white/[0.02]">
+                      <td class="text-slate-300 text-xs" x-text="fmt.date(lr.start_date) + ' → ' + fmt.date(lr.end_date)"></td>
+                      <td><span class="badge badge-sm badge-outline" x-text="lr.leave_type"></span></td>
+                      <td class="text-slate-400 text-xs max-w-[200px] truncate" x-text="lr.reason"></td>
+                      <td>
+                        <span class="badge badge-sm"
+                              :class="lr.status==='Approved' ? 'badge-success' : lr.status==='Rejected' ? 'badge-error' : 'badge-warning'"
+                              x-text="lr.status"></span>
+                      </td>
+                    </tr>
+                  </template>
+                  <template x-if="leaveRequests.length === 0">
+                    <tr><td colspan="4" class="text-center text-slate-500 text-sm py-8">No leave requests yet</td></tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Payroll Tab ══ -->
+        <div x-show="tab==='payroll'" x-transition class="space-y-6">
+          <template x-if="payroll">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Earnings -->
+              <div class="glass-card p-6 fade-in">
+                <h3 class="text-sm font-semibold text-emerald-400 mb-4 flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  Earnings
+                </h3>
+                <div class="space-y-3">
+                  <div class="flex justify-between text-sm"><span class="text-slate-400">Base Salary</span><span class="text-white font-medium" x-text="fmt.currency(payroll.baseSalary)"></span></div>
+                  <div class="flex justify-between text-sm"><span class="text-slate-400">HRA (40%)</span><span class="text-white font-medium" x-text="fmt.currency(payroll.hra)"></span></div>
+                  <div class="flex justify-between text-sm"><span class="text-slate-400">Performance Bonus</span><span class="text-white font-medium" x-text="fmt.currency(payroll.performanceBonus)"></span></div>
+                  <div class="flex justify-between text-sm"><span class="text-slate-400">LTA</span><span class="text-white font-medium" x-text="fmt.currency(payroll.lta)"></span></div>
+                  <div class="flex justify-between text-sm"><span class="text-slate-400">Food Allowance</span><span class="text-white font-medium" x-text="fmt.currency(payroll.foodAllowance)"></span></div>
+                  <div class="flex justify-between text-sm"><span class="text-slate-400">Medical Allowance</span><span class="text-white font-medium" x-text="fmt.currency(payroll.medicalAllowance)"></span></div>
+                  <div class="border-t border-white/10 pt-3 flex justify-between text-sm font-bold"><span class="text-emerald-400">Gross Earnings</span><span class="text-emerald-400" x-text="fmt.currency(payroll.grossEarnings)"></span></div>
+                </div>
+              </div>
+
+              <!-- Deductions + Net -->
+              <div class="space-y-6">
+                <div class="glass-card p-6 fade-in fade-d1">
+                  <h3 class="text-sm font-semibold text-red-400 mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15"/></svg>
+                    Deductions
+                  </h3>
+                  <div class="space-y-3">
+                    <div class="flex justify-between text-sm"><span class="text-slate-400">PF Contribution (12%)</span><span class="text-red-300 font-medium" x-text="'- ' + fmt.currency(payroll.pfContribution)"></span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-400">Professional Tax</span><span class="text-red-300 font-medium" x-text="'- ' + fmt.currency(payroll.professionalTax)"></span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-400">Attendance Deduction</span><span class="text-red-300 font-medium" x-text="'- ' + fmt.currency(payroll.attendanceDeduction)"></span></div>
+                    <p class="text-xs text-slate-500" x-text="payroll.unpaidLeaveDays + ' unpaid leave day(s) this month'"></p>
+                    <div class="border-t border-white/10 pt-3 flex justify-between text-sm font-bold"><span class="text-red-400">Total Deductions</span><span class="text-red-400" x-text="'- ' + fmt.currency(payroll.totalDeductions)"></span></div>
+                  </div>
+                </div>
+
+                <div class="glass-card stat-card p-6 fade-in fade-d2">
+                  <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Net Salary</p>
+                  <p class="text-3xl font-extrabold gradient-text mt-2" x-text="fmt.currency(payroll.netSalary)"></p>
+                  <p class="text-xs text-slate-500 mt-1" x-text="'Total Wage: ' + fmt.currency(payroll.totalWage)"></p>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    function employeeApp() {
+      return {
+        tab: 'dashboard',
+        user: null,
+        todayStatus: null,
+        clockLoading: false,
+        attendanceHistory: [],
+        leaveRequests: [],
+        leaveForm: { startDate: '', endDate: '', leaveType: 'Casual', reason: '' },
+        leaveLoading: false,
+        payroll: null,
+        calendar: null,
+
+        async init() {
+          if (!requireAuth('Employee')) return;
+          this.user = getUser();
+          await this.loadStatus();
+          await this.loadLeaves();
+          await this.loadPayroll();
+
+          // Watch for tab change to attendance to init calendar
+          this.$watch('tab', (val) => {
+            if (val === 'attendance') {
+              this.$nextTick(() => this.initCalendar());
+            }
+          });
+        },
+
+        async loadStatus() {
+          try {
+            this.todayStatus = await api('/attendance/status');
+          } catch {}
+        },
+
+        async checkIn() {
+          this.clockLoading = true;
+          try {
+            await api('/attendance/checkin', { method: 'POST' });
+            showToast('Checked in! Have a productive day 🚀', 'success');
+            await this.loadStatus();
+          } catch (e) { showToast(e.message, 'error'); }
+          finally { this.clockLoading = false; }
+        },
+
+        async checkOut() {
+          this.clockLoading = true;
+          try {
+            await api('/attendance/checkout', { method: 'POST' });
+            showToast('Checked out! Great work today ✨', 'success');
+            await this.loadStatus();
+          } catch (e) { showToast(e.message, 'error'); }
+          finally { this.clockLoading = false; }
+        },
+
+        async loadLeaves() {
+          try {
+            this.leaveRequests = await api('/leave/my-requests');
+          } catch {}
+        },
+
+        async submitLeave() {
+          this.leaveLoading = true;
+          try {
+            await api('/leave/request', {
+              method: 'POST',
+              body: {
+                startDate: this.leaveForm.startDate,
+                endDate: this.leaveForm.endDate,
+                leaveType: this.leaveForm.leaveType,
+                reason: this.leaveForm.reason,
+              },
+            });
+            showToast('Leave request submitted for approval', 'success');
+            this.leaveForm = { startDate: '', endDate: '', leaveType: 'Casual', reason: '' };
+            await this.loadLeaves();
+          } catch (e) { showToast(e.message, 'error'); }
+          finally { this.leaveLoading = false; }
+        },
+
+        async loadPayroll() {
+          try {
+            const data = await api('/attendance/payroll');
+            this.payroll = data.payroll;
+          } catch {}
+        },
+
+        async initCalendar() {
+          if (this.calendar) return;
+
+          // Get attendance history
+          try {
+            this.attendanceHistory = await api('/attendance/history');
+          } catch {}
+
+          // Get approved leaves
+          let approved = [];
+          try { approved = await api('/leave/approved'); } catch {}
+
+          const events = [];
+
+          // Attendance events
+          this.attendanceHistory.forEach(a => {
+            let color = '#6b7280'; // gray / absent
+            let title = 'Absent';
+            if (a.status === 'Present') { color = '#10b981'; title = '✓ Present'; }
+            else if (a.status === 'On Leave') { color = '#f59e0b'; title = '🏖 Leave'; }
+            else if (a.status === 'Half Day') { color = '#3b82f6'; title = '½ Day'; }
+            events.push({ title, start: a.date, backgroundColor: color, borderColor: color, allDay: true });
+          });
+
+          // Approved leave ranges
+          approved.forEach(l => {
+            events.push({
+              title: '🏖 ' + l.leave_type + ' Leave',
+              start: l.start_date,
+              end: new Date(new Date(l.end_date).getTime() + 86400000).toISOString().split('T')[0],
+              backgroundColor: 'rgba(245,158,11,0.25)',
+              borderColor: '#f59e0b',
+              allDay: true,
+            });
+          });
+
+          const calendarEl = document.getElementById('attendance-calendar');
+          if (!calendarEl) return;
+
+          this.calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth' },
+            events,
+            height: 'auto',
+            dayMaxEvents: 2,
+          });
+          this.calendar.render();
+        },
+      };
+    }
+  </script>
+</body>
+</html>
