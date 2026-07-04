@@ -171,9 +171,7 @@ While the internal architecture relies on zero external networking for database 
 ```
 <div align="center">
 
-### Made with
-
-by Saha & Bera
+### Made with ♥️ by Saha & Bera :)
 
 *If any dispute feel free to contact-*
 
