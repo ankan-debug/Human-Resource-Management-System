@@ -9,6 +9,7 @@
 [![Security: Bcrypt](https://img.shields.io/badge/Security-Bcrypt-red?style=for-the-badge&logo=springsecurity&logoColor=white)](#)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](#)
+
 *A high-performance, self-contained ecosystem engineered for rapid deployment, ultra-low latency, and secure data handling.*
 
 </div>
