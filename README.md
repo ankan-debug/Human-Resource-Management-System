@@ -89,8 +89,8 @@ To deploy this project, you will need the following dependencies installed on yo
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/ankan-debug/project-name.git
-   cd project-name
+   git clone https://github.com/ankan-debug/Human-Resource-Management-System.git
+   cd Human-Resource-Management-System
    ```
 
 2. **Install core dependencies:**
