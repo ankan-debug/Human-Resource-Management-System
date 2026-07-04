@@ -144,20 +144,3 @@ While the internal architecture relies on zero external networking for database 
 📧 [amdevriju@gmail.com](mailto:amdevriju@gmail.com)
 
 </div>
-
-**Response (200 OK):**
-```json
-{
-  "status": "operational",
-  "uptime": "12h 34m 12s",
-  "database": "connected",
-  "latency": "2ms"
-}
-
-```
-<div align="center">
-### Made with ♥️ by Saha & Bera
-**If any dispute feel free to contact-**
-📧 sahaankan628@gmail.com
-📧 amdevriju@gmail.com
-</div>
