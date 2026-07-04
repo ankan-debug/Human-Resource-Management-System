@@ -1,0 +1,22 @@
+{
+  "name": "ood-hrms",
+  "version": "1.0.0",
+  "description": "OOD HRMS - Odoo x Adamas University Hackathon 2026",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node db/seed.js"
+  },
+  "keywords": ["hrms", "hackathon", "odoo"],
+  "author": "Team OOD",
+  "license": "MIT",
+  "dependencies": {
+    "sql.js": "^1.11.0",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
