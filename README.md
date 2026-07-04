@@ -14,7 +14,9 @@
 </div>
 
 <br />
+
 ## 📖 Table of Contents
+
 - [Overview](#-overview)
 - [System Architecture](#-system-architecture)
 - [Directory Structure](#-directory-structure)
@@ -175,10 +177,8 @@ by Saha & Bera
 
 *If any dispute feel free to contact-*
 
-[sahaankan628@gmail.com](mailto: sahaankan628@gmail.com)
+[sahaankan628@gmail.com](mailto:sahaankan628@gmail.com)
 
-[amdevriju@gmail.com](mailto:
-
-amdevriju@gmail.com)
+[amdevriju@gmail.com](mailto:amdevriju@gmail.com)
 
 </div>
