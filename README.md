@@ -1,6 +1,8 @@
 
 <div align="center">
+  
 # 🚀 Human Resource Management System (HRMS)
+
 [![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](#)
 [![Express.js](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge&logo=express&logoColor=white)](#)
 [![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)](#)
@@ -156,7 +158,17 @@ While the internal architecture relies on zero external networking for database 
 }
 ```
 <div align="center">
-### Engineered with ♥️ by Saha & Bera
-*For inquiries, technical support, or collaborative opportunities, please reach out:*
-📧 sahaankan628@gmail.com  |  📧 amdevriju@gmail.com
+
+### Made with
+
+by Saha & Bera
+
+*If any dispute feel free to contact-*
+
+[sahaankan628@gmail.com](mailto: sahaankan628@gmail.com)
+
+[amdevriju@gmail.com](mailto:
+
+amdevriju@gmail.com)
+
 </div>
