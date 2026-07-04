@@ -178,6 +178,6 @@ While the internal architecture relies on zero external networking for database 
 
 [sahaankan628@gmail.com](mailto:sahaankan628@gmail.com)
 
-[amdevriju@gmail.com](mailto:amdevriju@gmail.com)
+[amdevriju@gmail.com](mailto:amdevrizu@gmail.com)
 
 </div>
