@@ -10,7 +10,9 @@
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](#)
 *A high-performance, self-contained ecosystem engineered for rapid deployment, ultra-low latency, and secure data handling.*
+
 </div>
+
 <br />
 ## 📖 Table of Contents
 - [Overview](#-overview)
@@ -26,13 +28,17 @@
 - [API Reference](#-api-reference)
 - [Support & Contact](#-support--contact)
 ---
+
 ## 📌 Overview
 Developed as a flagship submission for the **Odoo x Adamas University Hackathon '26**, this application redefines lightweight backend architecture for Human Resource management. 
 In modern distributed systems, network I/O is often the primary bottleneck. Engineered with a highly optimized monolithic structure, this platform deliberately bypasses traditional external networking overhead. By seamlessly integrating a robust **Node.js/Express** core with an embedded **SQLite** database, the system offers a self-reliant environment guaranteeing rapid processing speeds, minimal latency, and a frictionless deployment pipeline.
 ---
+
 ## 🏗 System Architecture
 The application adopts a strictly localized execution philosophy for internal data resolution. Instead of relying on containerized microservices communicating over TCP/IP layers, the entire processing pipeline and data persistence layer exist within the same memory space. 
+
 ```text
+
 [ Client Application ] 
         │
         ▼ (REST API via HTTP/HTTPS)
@@ -51,6 +57,7 @@ The application adopts a strictly localized execution philosophy for internal da
 │  └────────────────────────────────────┘  │
 └──────────────────────────────────────────┘
 ```
+
 ## 📂 Directory Structure
 ```text
 HR-Management-System/
@@ -68,6 +75,7 @@ HR-Management-System/
 ├── server.js             # Application entry point
 └── package.json          # Dependency management
 ```
+
 ## ✨ Core Advantages
  * ⚡ **Ultra-Low Latency:** Streamlined internal data routing eliminates the traditional overhead associated with external API layers.
  * 📦 **Frictionless Deployment:** A drop-in ready, self-contained architecture requiring zero complex environment configurations.
@@ -91,7 +99,9 @@ Taking a proactive approach to application security, this HRMS implements strict
  * **npm** (v9.x or higher) or **yarn**
  * **Docker** (Optional, for containerized deployment)
  * **Git**
-### Local Installation
+ * 
+### Local Installations 
+
  1. **Clone the repository:**
    ```bash
    git clone [https://github.com/ankan-debug/Human-Resource-Management-System.git](https://github.com/ankan-debug/Human-Resource-Management-System.git)
